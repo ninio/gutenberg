@@ -211,7 +211,18 @@ export default class TinyMCE extends Component {
 				} );
 
 				editor.on( 'init', () => {
-					// See https://github.com/tinymce/tinymce/blob/master/src/core/main/ts/keyboard/FormatShortcuts.ts
+					// History is handled internally by RichText.
+					//
+					// See: https://github.com/tinymce/tinymce/blob/master/src/core/main/ts/api/UndoManager.ts
+					[ 'z', 'y' ].forEach( ( character ) => {
+						editor.shortcuts.remove( `meta+${ character }` );
+					} );
+					editor.shortcuts.remove( 'meta+shift+z' );
+
+					// Reset TinyMCE's default formatting shortcuts, since
+					// RichText supports only registered formats.
+					//
+					// See: https://github.com/tinymce/tinymce/blob/master/src/core/main/ts/keyboard/FormatShortcuts.ts
 					[ 'b', 'i', 'u' ].forEach( ( character ) => {
 						editor.shortcuts.remove( `meta+${ character }` );
 					} );
@@ -219,6 +230,7 @@ export default class TinyMCE extends Component {
 						editor.shortcuts.remove( `access+${ number }` );
 					} );
 
+					// Restore the original `setHTML` once initialized.
 					editor.dom.setHTML = setHTML;
 				} );
 
